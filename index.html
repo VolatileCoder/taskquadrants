@@ -4,8 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Taskpad</title>
-  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAsCAYAAAAn4+taAAAAAXNSR0IArs4c6QAAA5RJREFUaEPV2ktME0EYAOB/QVgeXREWpKAECvWgkUYSPNWQGElIFC5qjc8ThhP4ClGTRm/GgwkhBGIQ8WDUyEENaBqfUSIHJR6MHhqgVjEB2qa1lSJSWLJm1izpY7vdx7Rs59JDJzv/139mdh4lII2L2+1me3t7we12AyHkCPmmWf+XEVj4/gFCv6aBZZZTxyUIyKI2Q97WXVCwowk2GvcIxhiOQMHFVPKMDbCesYHUBZ6gJWpbA5Q3XYYsXfFarNGIGMjM8+us//MTzSD4QEi6CiqP9EB2gZ4QQkRAvB/vsa63PZpD8AHlV+2GvL1XgR8T0YFy6WL+/mYn+pqBZUKahQRWSLAF68Eb+CMYIwfxfnrIul53xVQoMbdCUd1h2JBflDIgu8pA0DEKcy9vALPo59pFiBFXNfcZr3CQn48vsvOT7yLq0PVHQb/vfMoA0Q0t/BiH6aEOSYi1MeK4c5Jd8kxGPKv61CDklu9cNwhqeLzHAo8m80UzgeoZDIb/0+/U7WNsyPstImhj6wMgi2vWDeLxeKDrmhX8SxmiMSBEe3u7NiEIEW92ClfxCIqiCM1lRAlibYxopWspRWgKIhVRWVEGZ851AupO4d1ME11LKkJPLsLZzktAV9bGrBHXHSIH0aJ3Qm3bXcgpMWoLIheRm8kAei1oCqIEgcaEpiBSEWW6VWim7YAywRfNQKQi0MvuQOFXyAg4YlYcqrqWz+cDmqZVLVnkINCywzXUBkJLJ8UQhEBLBrPZDI2NjYowchE6nQ4cg8fxQXjE7OwsB7BYLLIxShCoLWyQBWITlwkewadCDkYpAhuk6NBNuHX/aQxCDkYNAgtknsmGF6EGmHN7RceDWGbUIrBA0EOcNR3w7NX7hANbCIMDgQ2CXjxvxidgeHhYFgYXAisEbXVtNptkjMlkkrWzQ1OsWME2a/F7dqkYiqIgGAxK2mMnQmDPCB+VVIyYgt9jS0EkDYIerAYjF5FUiFKMEkTSIXIxShEpgaBGuru7wW63iw5skiTBarVCaWlpwilcqAL2WSteFGIYtQhFGVFz9iuEwYFAkKn+g7AcmIn4HY2nhyCn2CB8+KD2ND4cgwvBn8ZH94btF0YhMztXGILjfgRhnE6nqjGBgha6H+ExeRV1UH2iX/ByFOuNlX+FhMKs5N16bdl/BQpNLfEhSJwOd4iGo32CCBR/xBfpcKsbbwZNy3t2IUza/vMhGvMPpFU+TjSkzNgAAAAASUVORK5CYII=">
+  <title>TaskQuadrants</title>
+  <link rel="icon" href="favicon.ico">
   <meta name="description" content="A free-to-use task management tool based on the Eisenhower Matrix.">
   <style>
     body {
@@ -30,6 +30,21 @@
         position: absolute;
         width: 500px;
         height: 150px;
+        margin:auto;
+        padding: 10px;
+        padding-top: 0px;
+        top:50%;
+        left:50%;
+        -ms-transform: translateY(-50%) translateX(-50%);
+        transform: translateY(-50%) translateX(-50%);
+    }
+    .helpModalContent{
+        background-color: rgba(255,255,255,1);
+        border: 2px outset black;
+        display:block;
+        position: absolute;
+        width: 500px;
+        height: 300px;
         margin:auto;
         padding: 10px;
         padding-top: 0px;
@@ -203,12 +218,38 @@
     visibility: hidden;
 }
 
+li {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+
+    line-height: 22px;
+    font-size: 20px;
+    list-style: none;
+    color: black;
+}
+
+li:before {
+    display: block;
+    flex-shrink: 0;
+    width: 25px;
+    height: 22px;
+    margin-right: 10px;
+
+    vertical-align: middle;
+
+    background: url('quadrants.png') no-repeat left center;
+    background-size: contain;
+
+    content: '';
+}
+
   </style>
 </head>
 
 <body onresize="resize()" onbeforeunload="io.save()" class="prevent-select">
-    <div>
 
+    <div>
         <table class="taskgrid" cellspacing="0">
             <tr>
                 <td>
@@ -242,11 +283,25 @@
     <div id="draggableTask" style="position:absolute;background-color: #FFF"></div>
     <div id="dragTarget" class="task">⨁</div>
     <div class="footer">
-        <p>Designed by Mark Milley | <a onclick="settings.open()" style="cursor: default;">Settings</a></p>
+        <p>Designed by Mark Milley | <a onclick="settings.open()" style="cursor: default;">Settings</a> | <a onclick="help.open()" style="cursor: default;">Help</a></p>
+    </div>
+    <div class="modal" id="helpModal" onclick="help.close()">
+              
+        <div class="helpModalContent">
+            <p style="position:absolute; top: -10px; right:5px; font-weight:bold; font-size: 12pt; cursor: default; border: 2px solid rgba(0,0,0,.3); color: rgba(0,0,0,.3);" onclick="help.close()">&nbsp;X&nbsp;</p>
+            <h1 style="text-align:center;">TaskQuadrants Help</h1>
+            <h3>A little info to set you up for success:</h3>
+            <ul>
+                <li>All your tasks are stored locally</li>
+                <li>Completed tasks are purged 12 hours after completion</li> 
+                <li>You can backup and restore your tasks in Settings</li>
+                <li><a href="https://www.youtube.com/results?search_query=eisenhower+matrix" target="_blank">Learn more about the Eisenhower Matrix</a></li>
+            </ul>
+        </div>
     </div>
     <div class="modal" id="settingsModal">
         <div class="modalContent">
-            <p style="position:absolute; top: -10px; right:5px; font-weight:bold; font-size: 12pt; cursor: default; border: 2px solid black;" onclick="settings.close()">&nbsp;X&nbsp;</p>
+            <p style="position:absolute; top: -10px; right:5px; font-weight:bold; font-size: 12pt; cursor: default; border: 2px solid rgba(0,0,0,.3); color: rgba(0,0,0,.3);" onclick="settings.close()">&nbsp;X&nbsp;</p>
             <h2 style="margin:0; padding-top:10px;">Utilities</h2>
             <table cellpadding="0" cellspacing="0" width="100%" style="margin-top: 25px;">
                 <tr>
@@ -262,6 +317,7 @@
             </table>
         </div>
     </div>
+    
     <script>
         class Task {
             quadrant = 1;
@@ -597,7 +653,16 @@
             }
         }
         
-        var state = new State();
+        const help = {
+            close: function(){
+                document.getElementById("helpModal").style.visibility="hidden";
+                document.getElementById("helpModal").style.display="none";
+            },
+            open: function(){
+                document.getElementById("helpModal").style.visibility="visible";
+                document.getElementById("helpModal").style.display="block";
+            }
+        }
 
         function resize(){
             let channelWidth = document.getElementById("centerPoint").clientWidth;
@@ -629,6 +694,9 @@
         window.setInterval(()=>{io.sync();}, 500);
         window.document.body.addEventListener("mousemove", ui.mouseMove);
         window.document.body.addEventListener("mouseup", ui.mouseUp);
+        if(state.tasks.length == 0){
+            help.open();
+        }
     </script>
 </body>
 
