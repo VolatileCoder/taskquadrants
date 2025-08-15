@@ -1,0 +1,634 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Taskpad</title>
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAsCAYAAAAn4+taAAAAAXNSR0IArs4c6QAAA5RJREFUaEPV2ktME0EYAOB/QVgeXREWpKAECvWgkUYSPNWQGElIFC5qjc8ThhP4ClGTRm/GgwkhBGIQ8WDUyEENaBqfUSIHJR6MHhqgVjEB2qa1lSJSWLJm1izpY7vdx7Rs59JDJzv/139mdh4lII2L2+1me3t7we12AyHkCPmmWf+XEVj4/gFCv6aBZZZTxyUIyKI2Q97WXVCwowk2GvcIxhiOQMHFVPKMDbCesYHUBZ6gJWpbA5Q3XYYsXfFarNGIGMjM8+us//MTzSD4QEi6CiqP9EB2gZ4QQkRAvB/vsa63PZpD8AHlV+2GvL1XgR8T0YFy6WL+/mYn+pqBZUKahQRWSLAF68Eb+CMYIwfxfnrIul53xVQoMbdCUd1h2JBflDIgu8pA0DEKcy9vALPo59pFiBFXNfcZr3CQn48vsvOT7yLq0PVHQb/vfMoA0Q0t/BiH6aEOSYi1MeK4c5Jd8kxGPKv61CDklu9cNwhqeLzHAo8m80UzgeoZDIb/0+/U7WNsyPstImhj6wMgi2vWDeLxeKDrmhX8SxmiMSBEe3u7NiEIEW92ClfxCIqiCM1lRAlibYxopWspRWgKIhVRWVEGZ851AupO4d1ME11LKkJPLsLZzktAV9bGrBHXHSIH0aJ3Qm3bXcgpMWoLIheRm8kAei1oCqIEgcaEpiBSEWW6VWim7YAywRfNQKQi0MvuQOFXyAg4YlYcqrqWz+cDmqZVLVnkINCywzXUBkJLJ8UQhEBLBrPZDI2NjYowchE6nQ4cg8fxQXjE7OwsB7BYLLIxShCoLWyQBWITlwkewadCDkYpAhuk6NBNuHX/aQxCDkYNAgtknsmGF6EGmHN7RceDWGbUIrBA0EOcNR3w7NX7hANbCIMDgQ2CXjxvxidgeHhYFgYXAisEbXVtNptkjMlkkrWzQ1OsWME2a/F7dqkYiqIgGAxK2mMnQmDPCB+VVIyYgt9jS0EkDYIerAYjF5FUiFKMEkTSIXIxShEpgaBGuru7wW63iw5skiTBarVCaWlpwilcqAL2WSteFGIYtQhFGVFz9iuEwYFAkKn+g7AcmIn4HY2nhyCn2CB8+KD2ND4cgwvBn8ZH94btF0YhMztXGILjfgRhnE6nqjGBgha6H+ExeRV1UH2iX/ByFOuNlX+FhMKs5N16bdl/BQpNLfEhSJwOd4iGo32CCBR/xBfpcKsbbwZNy3t2IUza/vMhGvMPpFU+TjSkzNgAAAAASUVORK5CYII=">
+  <style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 10pt;
+        overflow: hidden;
+    }
+    .modal {
+        background-color:rgba(0,0,0,.5);
+        display:none;
+        visibility: hidden;
+        position: absolute;
+        top:0;
+        bottom:0;
+        left:0;
+        right:0;
+    }
+    .modalContent{
+        background-color: rgba(255,255,255,1);
+        border: 2px outset black;
+        display:block;
+        position: absolute;
+        width: 500px;
+        height: 150px;
+        margin:auto;
+        padding: 10px;
+        padding-top: 0px;
+        top:50%;
+        left:50%;
+        -ms-transform: translateY(-50%) translateX(-50%);
+        transform: translateY(-50%) translateX(-50%);
+    }
+    .footer {
+        text-align: center;
+        position: absolute;
+        display: block;
+        bottom:0px;
+        left:50%;
+        -ms-transform: translateX(-50%);
+        transform: translateX(-50%);
+        font-size: .75em;
+        color: rgb(180,180,180);
+        font-weight:bold;
+    }
+    .taskgrid {
+        position: absolute;
+        left:50%;
+        -ms-transform: translateX(-50%);
+        transform: translateX(-50%);
+    }
+    .taskgrid tr th {
+        background-color: rgba(0,0,0,.3);
+        letter-spacing:.5em;
+        color: white;
+    }
+    .quadrant {
+        display:block;
+        overflow-x:hidden;
+        overflow-y: auto;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    .description {
+        position: absolute;
+        right: 10px;
+        left: 23px;
+        top: 0px;
+        bottom: 0px; 
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border:0px;
+        border-bottom: 1px solid rgb(180,180,180);
+        background: rgba(255,255,255,0);
+    }
+    .description:focus{
+        outline:none;
+        background: rgba(255,255,255,0);
+    }
+    .dragHandle {
+        position: absolute;
+        right: 0;
+        top: -2px;
+        bottom: 0px;
+        color: #CCC;
+        cursor:grab;
+        font-size: .75em;
+    }
+    .draggableTask{
+        background-color: white;
+    }
+
+    .task {
+        margin-top: 5px;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        display:block;
+        position:relative;
+    }
+    .quadrantId{
+        display:block;
+        position:absolute;
+        text-align:center;
+        margin:0px;
+        padding:0px;
+        color: rgb(245,245,245);
+    
+    }
+
+
+.b-contain *,
+.b-contain *::before,
+.b-contain *::after {
+  box-sizing: content-box !important;
+}
+
+.b-contain input {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+}
+
+.b-contain span {
+  line-height: 1.5;
+  font-size: 1em;
+  font-family: inherit;
+}
+
+.b-contain {
+  display: table;
+  position: relative;
+  padding-left: 2rem;
+  cursor: default;
+  margin-bottom: 0.4rem;
+}
+
+.b-contain input[type="checkbox"] ~ .b-input {
+  position: absolute;
+  top: -2px;
+  left: 0;
+  height: 1em;
+  width: 1em;
+  background: rgb(255, 255, 255);
+  transition: background 250ms;
+  border: 2px solid #d48836;
+  border-radius: 0.2rem;
+}
+
+.b-contain input[type="checkbox"] ~ .b-input::after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: -7px;
+  width: 0.3rem;
+  height: 1.09rem;
+  border: solid #666;
+  border-width: 0 3px 3px 0;
+  transition: background 250ms;
+  transform: rotate(45deg);
+}
+
+.b-contain input:checked ~ .b-input::after {
+  display: block;
+}
+
+.b-contain:hover input[type="checkbox"]:not([disabled]) ~ .b-input,
+.b-contain input[type="checkbox"]:focus ~ .b-input {
+  background: rgb(255, 255, 255);
+  border-color: #d48836;
+}
+.b-contain input[type="checkbox"]:checked ~ .b-input {
+  background: rgb(255, 255, 255);
+  border-color: #d48836;
+}
+
+.b-contain:hover input[type="checkbox"]:not([disabled]):checked ~ .b-input,
+.b-contain input[type="checkbox"]:checked:focus ~ .b-input {
+  background: #FFF;
+  border-color: #d48836;
+}
+
+.prevent-select {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+#dragTarget {
+    background-color: #DDD;
+    color: white;
+    font-weight:bolder;
+    text-align:center;
+    font-size: 1.75em;
+    display:none;
+    visibility: hidden;
+}
+
+  </style>
+</head>
+
+<body onresize="resize()" onbeforeunload="io.save()" class="prevent-select">
+    <div>
+
+        <table class="taskgrid" cellspacing="0">
+            <tr>
+                <td>
+                    <div class="quadrantId" id="qid1">1</div>
+                    <div class="quadrant" id="quadrant1"></div>
+                </td>
+                <th valign="middle"><p style="text-orientation:upright;writing-mode: vertical-lr;">IMPORTANT</p></th>
+                <td>    
+                    <div class="quadrantId" id="qid2">2</div>
+                    <div class="quadrant" id="quadrant2"></div>
+                </td>
+            </tr>
+            <tr>
+                <th style="text-align:center;"><p>URGENT</p></th>
+                <th id="centerPoint"></th>
+                <th style="text-align:center;"><p>DEFERRABLE</p></th>
+            </tr>
+            <tr>
+                <td>
+                    <div class="quadrantId" id="qid3">3</div>
+                    <div class="quadrant" id="quadrant3"></div>
+                </td>
+                <th valign="middle"><p style="text-orientation:upright;writing-mode: vertical-lr;">TRIVIAL</p></th>
+                <td>
+                    <div class="quadrantId" id="qid4">4</div>
+                    <div class="quadrant" id="quadrant4"></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="draggableTask" style="position:absolute;background-color: #FFF"></div>
+    <div id="dragTarget" class="task">⨁</div>
+    <div class="footer">
+        <p>Designed by Mark Milley | <a onclick="settings.open()" style="cursor: default;">Settings</a></p>
+    </div>
+    <div class="modal" id="settingsModal">
+        <div class="modalContent">
+            <p style="position:absolute; top: -10px; right:5px; font-weight:bold; font-size: 12pt; cursor: default; border: 2px solid black;" onclick="settings.close()">&nbsp;X&nbsp;</p>
+            <h2 style="margin:0; padding-top:10px;">Utilities</h2>
+            <table cellpadding="0" cellspacing="0" width="100%" style="margin-top: 25px;">
+                <tr>
+                    <td style="border-right: 1px solid black;text-align:center; height: 70px; vertical-align: top;" width="50%">
+                        <b style="line-height: 30px;">Backup</b><br/>
+                        <button onclick="io.backup();">Download</button>
+                    </td>
+                    <td style="text-align:center; vertical-align: top;">
+                        <b style="line-height: 30px;">Restore</b><br/>
+                        <input type="file" id="restoreFileInput" style="width:90px;" onchange="io.restore(event);this.value='';">
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <script>
+        class Task {
+            quadrant = 1;
+            order = 0;
+            description = "";
+            completed = false;
+            completedOn = null;
+            id = crypto.randomUUID();
+            constructor(data){
+                if(data){
+                    this.order = data.order ? data.order : 0;
+                    this.quadrant = data.quadrant ? data.quadrant : 1;
+                    this.description = data.description ? data.description : "";
+                    this.completed = data.completed ? data.completed : false;
+                    this.completedOn = data.completedOn ? data.completedOn : null;
+                    this.id = data.id ? data.id : crypto.randomUUID();
+                }
+            }
+        }
+
+        class State {
+            tasks=[];
+            lastBackup = Date.now();
+            constructor(data){
+                if(data){
+                    if(!data.tasks && !data.lastBackup){
+                        console.log("INVALID STATE DATA. RESTORE FROM BACKUP.")
+                    }
+                    this.lastBackup = new Date(data.lastBackup);
+                    if(data.tasks){
+                        data.tasks.forEach(tdata => {
+                            this.tasks.push(new Task(tdata))
+                        });
+                    }
+                    this.prune();
+                }
+            }
+            prune(){
+                let tasks = [];
+                let h12 = 12 * 60 * 60 * 1000;
+                let cullDate = new Date().getTime() - h12;
+
+                this.tasks.forEach((t)=>{
+                    if(!t.completed || (t.completedOn) > cullDate){
+                        tasks.push(t);
+                    }
+                    else {
+                    }
+                })
+                this.tasks = tasks;
+            }
+            getQuadrant(quadrant){
+                let tasks = [];
+                this.tasks.forEach((t)=>{
+                    if(t.quadrant==quadrant){
+                        tasks.push(t);
+                    }
+                })
+                return tasks.sort((a,b)=>{return a.order==b.order ? 0 : a.order<b.order ? -1 : a.order>b.order ? 1 : 0});
+            }
+            getTask(id){
+                for(let i = 0; i<this.tasks.length; i++){
+                    let t = this.tasks[i];
+                    if(t.id==id){
+                        console.log('matched');
+                        return t;
+                    }
+                }
+                return null;
+            }
+            newTask(quadrant, id){
+
+                let taskElement = document.createElement("div");
+                taskElement.id = id ? id : crypto.randomUUID();
+                taskElement.className = "task";
+                taskElement.setAttribute("quadrant", quadrant);
+                
+
+                let descElement = document.createElement("input");
+                descElement.className = "description";
+                descElement.setAttribute("onkeydown","ui.onDescKeyDown(this);");
+                descElement.setAttribute("onblur","ui.onDescBlur(this);");
+                taskElement.appendChild(descElement);
+                
+                let checkElement = document.createElement("input");
+                checkElement.className = "checkbox css-checkbox";
+                checkElement.type = "checkbox";
+                checkElement.setAttribute("tabIndex", -1);
+                checkElement.setAttribute("onchange", "ui.onChecked(this);");
+                checkElement.setAttribute("name", taskElement.id + "_cb");
+                
+                let labelElement = document.createElement("label");
+                //labelElement.setAttribute("for", checkElement.getAttribute("name"));
+                labelElement.innerHTML="&nbsp;";
+                labelElement.className="b-contain";
+                labelElement.appendChild(checkElement);
+
+                let pseudoCheckbox = document.createElement("div")
+                pseudoCheckbox.className = "b-input"
+                labelElement.appendChild(pseudoCheckbox);
+
+                taskElement.appendChild(labelElement);
+
+                let dragElement = document.createElement("div")
+                dragElement.innerText = "☰";
+                dragElement.className="dragHandle";
+                dragElement.setAttribute("onmousedown", "ui.drag(this);");
+                taskElement.appendChild(dragElement);
+
+                let quadrantElement = document.getElementById("quadrant" + quadrant);
+                quadrantElement.appendChild(taskElement);
+            }
+            writeToDom(){
+                for(let q=1;q<5;q++){
+                    let qtasks = this.getQuadrant(q);
+                    let quadrantElement = document.getElementById("quadrant" + q);
+                    quadrantElement.innerHTML='';//.childNodes.forEach((node)=>quadrantElement.removeChild(node));
+                    qtasks.forEach((t, i)=>{
+                        let taskElement = document.getElementById(t.id);
+                        if(!taskElement){
+                            this.newTask(q, t.id);
+                            taskElement = document.getElementById(t.id);
+                        }
+                        taskElement.setAttribute("order", i);
+                        let d = taskElement.getElementsByClassName("description");
+                        if(d && d.length>0){
+                            d[0].value = t.description;
+                        }
+                        let c = taskElement.getElementsByClassName("checkbox");
+                        if(c && c.length>0){
+                            c[0].checked = t.completed;
+                        }
+                    });
+                    //push a blank task on
+                    this.newTask(q);
+                }
+            }
+            readFromDom(){
+                
+                let tasks = [];
+                for(let q=1;q<5;q++){
+                    let quadrantElement = document.getElementById("quadrant" + q);
+                    let taskElements = quadrantElement.childNodes;
+                    for(let i = 0; i<taskElements.length; i++) {
+                        let te = taskElements[i];
+                        let task = this.getTask(te.id)
+
+                        if (!task){
+                            task = new Task();
+                            task.id = te.id;
+                        }
+                        task.quadrant = q;
+                        task.order = i;
+                        let d = te.getElementsByClassName("description");
+                        if(d && d.length>0){
+                            task.description = d[0].value
+                        }
+                        let c = te.querySelectorAll('input[type="checkbox"]');
+                        if(c && c.length>0){
+                            let completed = c[0].checked
+                            if(!task.completedOn && completed){
+                                task.completedOn = new Date().getTime();
+                            }else if (task.completed && !completed) {
+                                task.completedOn = null;
+                            }
+                            task.completed = completed;
+                        }
+
+                        if(!task.description.trim()==""){
+                            tasks.push(task);
+                        }                        
+
+                    };
+                }
+                
+                this.tasks = tasks;
+            }
+        }
+
+        const ui = {
+            onDescKeyDown: function(descElement){
+                if(descElement && descElement.value !="" && descElement.parentElement && descElement.parentElement.nextElementSibling == null){
+                    state.newTask(descElement.parentElement.getAttribute("quadrant"));
+                }
+            },
+            onDescBlur: function(descElement){
+                if(descElement){
+                    let task = state.getTask(descElement.parentElement.id)
+                    if(!task || task.description!=descElement.value){
+                        io.save();
+                    }
+                }
+            },
+            onChecked:function(cbElement){
+                io.save();
+            },
+            dragging: false,
+            drag: function(dragHandle){
+                if(!ui.dragging){
+                    let draggableTask = document.getElementById("draggableTask");
+                    draggableTask.style.border="1px solid #c0c0c0";
+                    let task = dragHandle.parentElement;
+                    let dragTarget =  document.getElementById("dragTarget");
+                    task.parentElement.insertBefore(dragTarget,task)
+                    task.parentElement.removeChild(task)
+                    draggableTask.appendChild(task);
+                    ui.dragging = true;
+                    document.body.style.cursor = 'grabbing';
+
+                }
+            },
+            mouseMove: function(e){
+                if(ui.dragging){
+                    let draggableTask = document.getElementById("draggableTask");
+                    let channelWidth = document.getElementById("centerPoint").clientWidth;
+                    draggableTask.style.visibility = "visible";
+                    draggableTask.style.display= "block";
+                    
+                    let dragTarget =  document.getElementById("dragTarget");
+                    dragTarget.style.visibility = "visible";
+                    dragTarget.style.display= "block";
+                    
+                    draggableTask.style.width = Math.floor((document.body.clientWidth / 2) - channelWidth) + 'px';
+                    draggableTask.style.left = e.clientX - (Math.floor((document.body.clientWidth / 2) - channelWidth)) + "px";
+                    draggableTask.style.top = e.clientY + "px";
+                    let tasks = ui.getTasksFromPoint(e.clientX,e.clientY);
+                    if(tasks.length>0){
+                        let targetTask = tasks[0];
+                        targetTask.parentElement.insertBefore(dragTarget,targetTask);
+                    }
+                }         
+            },
+            mouseUp: function(e){
+                if(ui.dragging){
+                    ui.dragging = false;
+                    let dragTarget =  document.getElementById("dragTarget");
+                    let draggableTask = document.getElementById("draggableTask");
+                    dragTarget.parentElement.insertBefore(draggableTask.childNodes[0], dragTarget);
+                    draggableTask.parentElement.appendChild(dragTarget);
+                    draggableTask.style.visibility = "hidden";
+                    draggableTask.style.display= "none";
+                    
+                    dragTarget.style.visibility = "hidden";
+                    dragTarget.style.display= "none";
+                    io.save();
+                    io.load();
+                    document.body.style.cursor = '';
+                }  
+            },
+            getTasksFromPoint(x, y) {
+                const elements = [];
+                const tasks = [];
+                let element = document.elementFromPoint(x, y);
+                
+                let dragTarget =  document.getElementById("dragTarget");
+
+                while (element && element.localName!="html") {
+                    
+                    elements.push(element);
+                    if(element.className=="task" && element != dragTarget && element.parentNode.id!="draggableTask"){
+                        tasks.push(element);
+                    }
+                    element.style.pointerEvents = 'none'; // Temporarily hide the element from further queries
+                    element = document.elementFromPoint(x, y);
+                }
+
+                // Restore pointer-events
+                elements.forEach(el => el.style.pointerEvents = '');
+                return tasks;
+            }
+        }
+
+        const io = {
+            save: function(){
+                state.readFromDom();
+                localStorage.setItem('taskpad', JSON.stringify(state));
+                lastLoaded = Date.now();
+                localStorage.setItem('taskpad_saved', lastLoaded);         
+            },
+            load: function(){
+                const data = localStorage.getItem('taskpad');
+                if (data){
+                    state = new State(JSON.parse(data));
+                }
+                state.writeToDom();
+                lastLoaded = Date.now();
+            },
+            sync: function(){
+                let lastSaved  = localStorage.getItem('taskpad_saved');
+                if(lastSaved && lastSaved>lastLoaded){
+                    io.load();
+                }
+            },
+            backup: function() {
+                state.lastBackup = Date.now();
+                const blob = new Blob([JSON.stringify(state, null, 4)], { type: "application/json" });
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                let dateSuffix = new Date().toISOString().split(".")[0];
+                a.download = 'TaskPad Backup ' + dateSuffix +'.json';;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            },
+            restore: function (event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = JSON.parse(e.target.result);
+                    if(!data instanceof State){
+                        alert('Not a valid backup file');
+                        return;
+                    }
+                    state = new State(data);
+                    state.writeToDom();
+                    settings.close();
+                };
+                reader.readAsText(file);
+                
+            }
+        }
+
+        const settings = {
+            close: function(){
+                document.getElementById("settingsModal").style.visibility="hidden";
+                document.getElementById("settingsModal").style.display="none";
+            },
+            open: function(){
+                document.getElementById("settingsModal").style.visibility="visible";
+                document.getElementById("settingsModal").style.display="block";
+            }
+        }
+        
+        var state = new State();
+
+        function resize(){
+            let channelWidth = document.getElementById("centerPoint").clientWidth;
+            let channelHeight = document.getElementById("centerPoint").clientHeight;
+            let draggableTask = document.getElementById("draggableTask");
+            
+            draggableTask.style.width = Math.floor((document.body.clientWidth / 2) - channelWidth) + 'px';
+
+            let quadrants = document.getElementsByClassName("quadrant");
+            for(i=0; i<quadrants.length; i++){
+                quadrants[i].style.width = Math.floor((document.body.clientWidth / 2) - channelWidth) + 'px';
+                quadrants[i].style.height = Math.floor((window.innerHeight / 2) - channelHeight - 5) + 'px';
+          
+                
+                let qid = document.getElementById("qid"+(i+1));
+                if(qid){
+                    qid.style.width = Math.floor((document.body.clientWidth / 2) - channelWidth) + 'px';
+                    qid.style.height = Math.floor((window.innerHeight / 2) - channelHeight - 5) + 'px';
+                    qid.style.fontSize = Math.floor((window.innerHeight / 2) - channelHeight - 5)*.85 + 'px'
+                }
+            }
+            
+            
+        }
+        var state = new State();
+        var lastLoaded = null;
+        io.load();
+        resize();
+        window.setInterval(()=>{io.sync();}, 500);
+        window.document.body.addEventListener("mousemove", ui.mouseMove);
+        window.document.body.addEventListener("mouseup", ui.mouseUp);
+    </script>
+</body>
+
+</html>
