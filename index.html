@@ -44,7 +44,7 @@
         display:block;
         position: absolute;
         width: 500px;
-        height: 300px;
+        height: 250px;
         margin:auto;
         padding: 10px;
         padding-top: 0px;
@@ -223,8 +223,8 @@ li {
     align-items: center;
     margin: 10px 0;
 
-    line-height: 22px;
-    font-size: 20px;
+    line-height: px;
+    font-size: 15px;
     list-style: none;
     color: black;
 }
@@ -232,8 +232,8 @@ li {
 li:before {
     display: block;
     flex-shrink: 0;
-    width: 25px;
-    height: 22px;
+    width: 17px;
+    height: 15px;
     margin-right: 10px;
 
     vertical-align: middle;
@@ -290,9 +290,10 @@ li:before {
         <div class="helpModalContent">
             <p style="position:absolute; top: -10px; right:5px; font-weight:bold; font-size: 12pt; cursor: default; border: 2px solid rgba(0,0,0,.3); color: rgba(0,0,0,.3);" onclick="help.close()">&nbsp;X&nbsp;</p>
             <h1 style="text-align:center;">TaskQuadrants Help</h1>
-            <h3>A little info to set you up for success:</h3>
+            <h3 style="text-align:center;">A little help to set you up for success:</h3>
             <ul>
-                <li>All your tasks are stored locally</li>
+                <li>All your tasks are stored locally on your computer</li>
+                <li>Tasks can be dragged using the handle that looks like: <span style="color:rgba(0,0,0,.3)">☰</span></li>
                 <li>Completed tasks are purged 12 hours after completion</li> 
                 <li>You can backup and restore your tasks in Settings</li>
                 <li><a href="https://www.youtube.com/results?search_query=eisenhower+matrix" target="_blank">Learn more about the Eisenhower Matrix</a></li>
